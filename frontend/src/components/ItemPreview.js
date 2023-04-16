@@ -31,6 +31,8 @@ const ItemPreview = (props) => {
     }
   };
 
+  console.log(ItemPreview);
+
   return (
     <div
       className="card bg-dark border-light p-3"
