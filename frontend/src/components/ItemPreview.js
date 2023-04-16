@@ -19,7 +19,7 @@ const mapDispatchToProps = (dispatch) => ({
 
 const ItemPreview = (props) => {
   const item = props.item;
-  
+  const placeholderImage= 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR-0SkrEHUD9n2WZNmndOUlfo6Fh0ZJi43OlVZ1w3sz&s';
   const handleClick = (ev) => {
     ev.preventDefault();
     if (item.favorited) {
