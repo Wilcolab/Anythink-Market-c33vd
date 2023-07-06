@@ -19,6 +19,7 @@ const mapDispatchToProps = (dispatch) => ({
 
 const ItemPreview = (props) => {
   const item = props.item;
+
   const handleClick = (ev) => {
     ev.preventDefault();
     if (item.favorited) {
@@ -46,14 +47,13 @@ const ItemPreview = (props) => {
           <p className="card-text crop-text-3">{item.description}</p>
         </Link>
         <div className="d-flex flex-row align-items-center pt-2 item-footer">
-          <Link to={`/@${item.seller.username}`}>
+          <Link to={`/@${item.seller.username}`} className="flex-grow-1">
             <img
               src={item.seller.image}
               alt={item.seller.username}
               className="user-pic rounded-circle pr-1"
             />
           </Link>
-          {item.seller.isVerified && <p className="flex-grow-1 mb-0"><img src="verified_seller.svg"/>TOP SELLER</p>}
           <button className="btn btn-outline-secondary" onClick={handleClick}>
             <i className="ion-heart"></i> {item.favoritesCount}
           </button>
