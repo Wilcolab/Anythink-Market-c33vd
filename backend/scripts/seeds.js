@@ -1,48 +1,54 @@
-//TODO: seeds script should come here, so we'll be able to put some data in our local env
-//TODO: seeds script should come here, so we'll be able to put some data in our local env
-require("dotenv").config();
-const mongoose = require('mongoose');
-require("../models/User");
-require("../models/Item");
-require("../models/Comment");
+const mongoose = require("mongoose");
+const connection = process.env.MONGODB_URI;
+mongoose.connect(connection);
 
+require("./models/User");
+require("./models/Item");
+require("./models/Comment");
 const User = mongoose.model("User");
 const Item = mongoose.model("Item");
 const Comment = mongoose.model("Comment");
 
-mongoose.connect(process.env.MONGODB_URI,()=>{
-    console.log('Connected')
-    seed();
-    mongoose.connection.close();
+async function seedDatabase() {
+  for (let i = 0; i < 100; i++) {
+    // add user
+    const user = { username: `user${i}`, email: `user${i}@gmail.com` };
+    const options = { upsert: true, new: true };
+    const createdUser = await User.findOneAndUpdate(user, {}, options);
+    
+    // add item to user
+    const item = {
+      slug: `slug${i}`,
+      title: `title ${i}`,
+      description: `description ${i}`,
+      seller: createdUser,
+    };
+    const createdItem = await Item.findOneAndUpdate(item, {}, options);
+    
+    // add comments to item
+    if (!createdItem?.comments?.length) {
+      let commentIds = [];
+      for (let j = 0; j < 100; j++) {
+        const comment = new Comment({
+          body: `body ${j}`,
+          seller: createdUser,
+          item: createdItem,
+        });
+        await comment.save();
+        commentIds.push(comment._id);
+      }
+      createdItem.comments = commentIds;
+      await createdItem.save();
+    }
+  }
+}
+
+seedDatabase()
+  .then(() => {
+  console.log("Finished DB seeding");
+  process.exit(0);
+})
+.catch((err) => {
+  console.log(`Error while running DB seed: ${err.message}`);
+  process.exit(1);
 });
-
-const seedContent = async(i)=>{
-    const user = new User()
-    user.username = `user${i}`;
-    user.email = `user${i}@mail.com`
-    user.setPassword(`user${i}pass`)
-
-    const newUser = await user.save();
-
-    const item = new Item();
-    item.title = `Item ${i}`;
-    item.description = `Description of item ${i}`
-    item.seller = newUser._id
-
-    const newItem = await item.save();
-
-    const comment  = new Comment();
-    comment.body = `Comment on item ${i}`;
-    comment.item = newItem._id;
-    comment.seller = newUser._id
-
-    const newComment = await comment.save();
-}
-const seed = ()=>{
-for (let i = 100;i<201;i++){
-
-    seedContent(i)
-    console.log(`Seeding ${i}`)
-}
-
-}
